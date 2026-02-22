@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Project Graveyard</title>
+    <meta name="description"
+        content="Where million-dollar ideas go to rest. Bury your abandoned side projects in a 3D graveyard and share the tombstones on Twitter.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Creepster&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>The Project<br>Graveyard <span class="tombstone-emoji">🪦</span></h1>
+            <p class="tagline">Where million-dollar ideas go to rest.</p>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="projectName">Project Name</label>
+                <input type="text" id="projectName" placeholder="e.g., FlareWise" autocomplete="off" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label for="causeOfDeath">Cause of Death</label>
+                <select id="causeOfDeath">
+                    <option value="Got bored">Got bored</option>
+                    <option value="Realized it existed">Realized it already existed</option>
+                    <option value="Vibecoded into a corner">Vibecoded into a corner</option>
+                    <option value="Couldn't center a div">Couldn't center a div</option>
+                    <option value="Abandoned for another project">Abandoned for another project</option>
+                    <option value="Ran out of API credits">Ran out of API credits</option>
+                    <option value="Scope creep killed it">Scope creep killed it</option>
+                    <option value="No users showed up">No users showed up</option>
+                    <option value="Custom">Custom...</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="customCauseGroup">
+                <label for="customCause">Your Cause</label>
+                <input type="text" id="customCause" placeholder="Type your own..." autocomplete="off" maxlength="40">
+            </div>
+
+            <div class="form-group date-group">
+                <label>Lifespan</label>
+                <div class="date-inputs">
+                    <input type="number" id="bornYear" placeholder="Born" min="1990" max="2030" value="2024">
+                    <span class="date-dash">—</span>
+                    <input type="number" id="diedYear" placeholder="Died" min="1990" max="2030" value="2025">
+                </div>
+            </div>
+
+            <button id="buryBtn">
+                <span class="btn-icon">⚰️</span>
+                Bury This Project
+            </button>
+        </div>
+
+        <div class="actions-section">
+            <button id="exportBtn" class="secondary" title="Export Image">
+                <span class="btn-icon">📸</span> Image
+            </button>
+            <div class="tooltip-wrapper" tabindex="0">
+                <button id="exportVideoBtn" class="secondary" disabled style="pointer-events: none; opacity: 0.5;">
+                    <span class="btn-icon">🎥</span> Video
+                </button>
+                <span class="tooltip-text">Coming soon...</span>
+            </div>
+            <button id="clearBtn" class="secondary danger" title="Exhume All">
+                <span class="btn-icon">💀</span> Clear
+            </button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number" id="buriedCount">0</span>
+                <span class="stat-label">Buried</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-number" id="topCause">—</span>
+                <span class="stat-label">Top Cause</span>
+            </div>
+        </div>
+
+        <div class="controls-help">
+            <div class="controls-help-title">🎮 Viewport Controls</div>
+            <div class="controls-help-items">
+                <div class="control-item"><span class="control-key">Click + Drag</span> Rotate</div>
+                <div class="control-item"><span class="control-key">Scroll</span> Zoom</div>
+                <div class="control-item"><span class="control-key">Shift + Drag</span> Pan</div>
+                <div class="control-item"><span class="control-key">Hover Grave</span> Summon spirit</div>
+            </div>
+        </div>
+
+        <div class="waitlist-promo">
+            <p>Want the <strong>Global MMO Graveyard</strong>?</p>
+            <a href="#" id="waitlistLink">Join the Waitlist →</a>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <div class="scene-overlay" id="sceneOverlay">
+            <p>← Bury your first project to populate the graveyard</p>
+        </div>
+    </div>
+
+    <!-- Ghost tooltip for grave hover -->
+    <div id="ghostTooltip" class="ghost-tooltip hidden">
+        <div class="ghost-name"></div>
+        <button class="ghost-remove-btn">🗑️ Exhume</button>
+    </div>
+
+    <!-- Waitlist Modal -->
+    <div id="waitlistModal" class="modal-backdrop hidden">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-icon">💀</div>
+            <h2 class="modal-title">Global MMO Graveyard</h2>
+            <p class="modal-subtitle">A massive shared graveyard where everyone buries their dead projects together.
+                Coming soon.</p>
+            <ul class="modal-features">
+                <li>🌍 Browse thousands of fallen projects</li>
+                <li>🏆 Leaderboards for top causes of death</li>
+                <li>🕯️ Leave flowers on others' graves</li>
+                <li>📊 Project death analytics &amp; trends</li>
+            </ul>
+            <div class="modal-form">
+                <input type="email" id="waitlistEmail" placeholder="your@email.com" autocomplete="email">
+                <button id="waitlistSubmit">Join Waitlist</button>
+            </div>
+            <p class="modal-fine-print">No spam. We'll notify you when we launch.</p>
+            <div id="waitlistSuccess" class="waitlist-success hidden">
+                <div class="success-icon">🪦</div>
+                <p>You're on the list! We'll haunt your inbox when we launch.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+
+</html>
