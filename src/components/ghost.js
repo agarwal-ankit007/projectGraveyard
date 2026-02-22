@@ -31,8 +31,8 @@ export function createGhostSpirit() {
         blending: THREE.AdditiveBlending,
     });
     const outerSprite = new THREE.Sprite(outerMat);
-    outerSprite.scale.set(7, 7, 1);
-    outerSprite.position.y = 1.5;
+    outerSprite.scale.set(4, 4, 1);
+    outerSprite.position.y = 1.0;
     ghost.add(outerSprite);
 
     // Mid layer — brighter, smaller
@@ -46,8 +46,8 @@ export function createGhostSpirit() {
         blending: THREE.AdditiveBlending,
     });
     const midSprite = new THREE.Sprite(midMat);
-    midSprite.scale.set(4, 5, 1);
-    midSprite.position.y = 1.5;
+    midSprite.scale.set(2.5, 3, 1);
+    midSprite.position.y = 1.0;
     ghost.add(midSprite);
 
     // Core — bright white-cyan center
@@ -61,8 +61,8 @@ export function createGhostSpirit() {
         blending: THREE.AdditiveBlending,
     });
     const coreSprite = new THREE.Sprite(coreMat);
-    coreSprite.scale.set(2, 2.5, 1);
-    coreSprite.position.y = 1.8;
+    coreSprite.scale.set(1.2, 1.5, 1);
+    coreSprite.position.y = 1.2;
     ghost.add(coreSprite);
 
     // Small orbiting wisps
@@ -77,26 +77,47 @@ export function createGhostSpirit() {
             blending: THREE.AdditiveBlending,
         });
         const wisp = new THREE.Sprite(wispMat);
-        wisp.scale.set(0.8, 0.8, 1);
+        wisp.scale.set(0.5, 0.5, 1);
         wisp.userData.orbitOffset = (i / 3) * Math.PI * 2;
-        wisp.userData.orbitRadius = 1.2 + Math.random() * 0.4;
+        wisp.userData.orbitRadius = 0.8 + Math.random() * 0.3;
         wisp.userData.orbitSpeed = 1.5 + Math.random() * 0.5;
         ghost.add(wisp);
     }
 
     // Ghost glow light — much brighter
-    const ghostLight = new THREE.PointLight('#aaddff', 8, 15);
-    ghostLight.position.set(0, 2, 0);
+    const ghostLight = new THREE.PointLight('#aaddff', 5, 10);
+    ghostLight.position.set(0, 1.5, 0);
     ghost.userData.light = ghostLight;
     ghost.add(ghostLight);
+
+    // Macro orbiting logic for the whole ghost grouping
+    ghost.userData.macroOrbitOffset = Math.random() * Math.PI * 2;
+    ghost.userData.macroOrbitRadius = 1.0 + Math.random() * 1.5;
+    ghost.userData.macroOrbitSpeed = 0.4 + Math.random() * 0.4;
+    // Direction: 1 or -1
+    ghost.userData.orbitDirection = Math.random() > 0.5 ? 1 : -1;
 
     return ghost;
 }
 
-export function animateGhost(ghostSpirit, timeStr) {
+export function animateGhost(ghostSpirit, timeStr, gravePosition) {
     if (!ghostSpirit) return;
     const t = timeStr * 0.001;
-    ghostSpirit.position.y = 5 + Math.sin(t * 1.5) * 0.4;
+
+    // Macro orbit targeting the grave position
+    if (gravePosition) {
+        const macroAngle = t * ghostSpirit.userData.macroOrbitSpeed * ghostSpirit.userData.orbitDirection + ghostSpirit.userData.macroOrbitOffset;
+        const macroRadius = ghostSpirit.userData.macroOrbitRadius;
+
+        // Add some wandering wobble to the orbit radius
+        const wobbleRadius = macroRadius + Math.sin(t * 0.8 + ghostSpirit.userData.macroOrbitOffset) * 0.5;
+
+        ghostSpirit.position.x = gravePosition.x + Math.cos(macroAngle) * wobbleRadius;
+        ghostSpirit.position.z = gravePosition.z + Math.sin(macroAngle) * wobbleRadius;
+        ghostSpirit.position.y = gravePosition.y + 2.5 + Math.sin(t * 1.5 + ghostSpirit.userData.macroOrbitOffset) * 0.4;
+    } else {
+        ghostSpirit.position.y = 2.5 + Math.sin(t * 1.5) * 0.4;
+    }
 
     // Pulse outer glow
     const outerSprite = ghostSpirit.children[0];

@@ -150,6 +150,7 @@ toggleGhostBtn.addEventListener('click', () => {
             const spirit = createGhostSpirit();
             spirit.position.copy(grave.position);
             spirit.position.y = 5;
+            spirit.userData.anchorGrave = grave;
             scene.add(spirit);
             allSpirits.push(spirit);
         });
@@ -246,9 +247,9 @@ function animate() {
     updateParticles(particleData, delta, Math.floor(timeStr / 1000));
 
     if (ghostsToggledOn) {
-        allSpirits.forEach(spirit => animateGhost(spirit, timeStr));
+        allSpirits.forEach(spirit => animateGhost(spirit, timeStr, spirit.userData.anchorGrave.position));
     } else {
-        animateGhost(ghostSpirit, timeStr);
+        animateGhost(ghostSpirit, timeStr, hoveredGrave ? hoveredGrave.position : null);
     }
 
     if (hoveredGrave) updateTooltipPosition();
