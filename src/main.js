@@ -24,6 +24,7 @@ const clearBtn = document.getElementById('clearBtn');
 const ghostTooltip = document.getElementById('ghostTooltip');
 const ghostNameEl = ghostTooltip.querySelector('.ghost-name');
 const ghostRemoveBtn = ghostTooltip.querySelector('.ghost-remove-btn');
+const toggleGhostBtn = document.getElementById('toggleGhostBtn');
 
 // --- Three.js Setup ---
 const scene = new THREE.Scene();
@@ -134,6 +135,32 @@ function showGhost(graveGroup) {
     ghostTooltip.classList.remove('hidden');
 }
 
+let ghostsToggledOn = false;
+let allSpirits = [];
+
+toggleGhostBtn.addEventListener('click', () => {
+    ghostsToggledOn = !ghostsToggledOn;
+    hideGhost(); // Hide tooltip/hover ghost
+
+    if (ghostsToggledOn) {
+        toggleGhostBtn.classList.add('active');
+        toggleGhostBtn.style.backgroundColor = '#2ea043'; // active green
+
+        graveyard.graves.forEach(grave => {
+            const spirit = createGhostSpirit();
+            spirit.position.copy(grave.position);
+            spirit.position.y = 5;
+            scene.add(spirit);
+            allSpirits.push(spirit);
+        });
+    } else {
+        toggleGhostBtn.classList.remove('active');
+        toggleGhostBtn.style.backgroundColor = '';
+        allSpirits.forEach(s => scene.remove(s));
+        allSpirits = [];
+    }
+});
+
 function updateTooltipPosition() {
     if (!hoveredGrave) return;
     const worldPos = new THREE.Vector3().copy(hoveredGrave.position);
@@ -166,6 +193,11 @@ container.addEventListener('mousemove', (event) => {
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
+
+    if (ghostsToggledOn) {
+        scheduleHide();
+        return;
+    }
 
     const graveMeshes = [];
     graveyard.graves.forEach(g => {
@@ -212,7 +244,12 @@ function animate() {
     graveyard.updateAnimations();
     updateEnvironment(envProps, timeStr);
     updateParticles(particleData, delta, Math.floor(timeStr / 1000));
-    animateGhost(ghostSpirit, timeStr);
+
+    if (ghostsToggledOn) {
+        allSpirits.forEach(spirit => animateGhost(spirit, timeStr));
+    } else {
+        animateGhost(ghostSpirit, timeStr);
+    }
 
     if (hoveredGrave) updateTooltipPosition();
     renderer.render(scene, camera);

@@ -179,18 +179,40 @@ function createGate(scene, stoneMat, darkStoneMat, ironMat) {
     signCanvas.width = 512;
     signCanvas.height = 128;
     const sctx = signCanvas.getContext('2d');
-    sctx.clearRect(0, 0, 512, 128);
-    sctx.fillStyle = '#c0c8b0';
-    sctx.font = '48px Creepster, cursive';
-    sctx.textAlign = 'center';
-    sctx.textBaseline = 'middle';
-    sctx.fillText('PROJECT GRAVEYARD', 256, 64);
     const signTexture = new THREE.CanvasTexture(signCanvas);
     const signTextGeo = new THREE.PlaneGeometry(5.5, 1.2);
     const signTextMat = new THREE.MeshBasicMaterial({ map: signTexture, transparent: true, depthWrite: false });
     const signText = new THREE.Mesh(signTextGeo, signTextMat);
     signText.position.set(-2.75, -1.2, 0.07);
     signPivot.add(signText);
+
+    // Explicitly load the font using the CSS Font Loading API
+    // so the Canvas can use it immediately without waiting for a hidden DOM element
+    const creepsterFont = new FontFace(
+        'Creepster',
+        'url(https://fonts.gstatic.com/s/creepster/v13/AlZy_zVUqJz4yMrniH4Rcn35.woff2)'
+    );
+
+    creepsterFont.load().then((font) => {
+        document.fonts.add(font);
+        sctx.clearRect(0, 0, 512, 128);
+        sctx.fillStyle = '#c0c8b0';
+        sctx.font = '48px Creepster, cursive';
+        sctx.textAlign = 'center';
+        sctx.textBaseline = 'middle';
+        sctx.fillText('PROJECT GRAVEYARD', 256, 64);
+        signTexture.needsUpdate = true;
+    }).catch(err => {
+        console.warn('Font failed to load for canvas', err);
+        // Fallback draw
+        sctx.clearRect(0, 0, 512, 128);
+        sctx.fillStyle = '#c0c8b0';
+        sctx.font = '48px sans-serif';
+        sctx.textAlign = 'center';
+        sctx.textBaseline = 'middle';
+        sctx.fillText('PROJECT GRAVEYARD', 256, 64);
+        signTexture.needsUpdate = true;
+    });
 
     const chainGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.8, 6);
     const chainMat = new THREE.MeshStandardMaterial({ color: '#3a3a40', roughness: 0.5, metalness: 0.6 });
