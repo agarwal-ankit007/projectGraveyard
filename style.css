@@ -275,12 +275,13 @@ button.danger:hover {
 
 /* --- Actions --- */
 .actions-section {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
 .actions-section button {
-    flex: 1;
+    width: 100%;
     font-size: 0.85rem;
     padding: 10px 12px;
 }
